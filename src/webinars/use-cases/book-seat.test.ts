@@ -8,10 +8,6 @@ import { Webinar } from '../entities/webinar.entity';
 import { Participation } from '../entities/participation.entity';
 import { WebinarNotEnoughSeatsException } from '../exceptions/webinar-not-enough-seats';
 import { UserAlreadyParticipatingToWebinar } from '../exceptions/user-already-participating-to-webinar';
-import { OrganizeWebinars } from './organize-webinar';
-import { IIdGenerator } from '../../core/ports/id-generator.interface';
-import { IDateGenerator } from '../../core/ports/date-generator.interface';
-
 
 
 describe('Feature : Book a Seat in a webinar', () => {
@@ -20,9 +16,6 @@ describe('Feature : Book a Seat in a webinar', () => {
   let userRepository: InMemoryUserRepository;
   let mailer: InMemoryMailer;
   let useCase: BookSeat;
-  let idGenerator: IIdGenerator;
-  let organizeWebinars: OrganizeWebinars;
-  let dateGenerator: IDateGenerator;
 
   const payload = {
     webinarId: 'webinar-1',
@@ -40,8 +33,10 @@ describe('Feature : Book a Seat in a webinar', () => {
 
   it('should book a seat successfully', async () => {
     const user = new User({ id: 'user-1', email: 'user1@example.com', password: 'password' });
+    const organizer = new User({ id: 'organizer-1', email: 'email', password: 'password' });
     const webinar = new Webinar({ id: 'webinar-1', organizerId: 'organizer-1', title: 'Webinar 1', startDate: new Date('2024-01-10T10:00:00.000Z'), endDate: new Date('2024-01-10T11:00:00.000Z'), seats: 100 });
     userRepository.database.push(user);
+    userRepository.database.push(organizer);
     webinarRepository.database.push(webinar);
 
     await useCase.execute(payload);
@@ -58,7 +53,6 @@ describe('Feature : Book a Seat in a webinar', () => {
 
     await expect(useCase.execute(payload)).rejects.toThrow(WebinarNotEnoughSeatsException);
   });
-
 
   it('should throw an error if user is already participating', async () => {
     const user = new User({ id: 'user-1', email: 'user1@example.com', password: 'password' });

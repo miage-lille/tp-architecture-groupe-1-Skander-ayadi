@@ -7,8 +7,7 @@ export class InMemoryWebinarRepository implements IWebinarRepository {
     this.database.push(webinar);
   }
 
-  async findById(webinarId: string): Promise<Webinar> {
-    this.database.find((webinar) => webinar.props.id === webinarId);
+  async findById(webinarId: string): Promise<Webinar | undefined> {
+    return this.database.find((webinar) => webinar.props.id === webinarId);
   }
-
 }

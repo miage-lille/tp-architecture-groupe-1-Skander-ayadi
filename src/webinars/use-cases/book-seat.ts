@@ -30,8 +30,16 @@ export class BookSeat implements Executable<Request, Response> {
 
     const userId = user.props.id;
 
+    if(!userId) {
+      throw new Error('User not found');
+    }
+
     const webinar = await this.webinarRepository.findById(webinarId);
 
+    if(!webinar) {
+      throw new Error('Webinar not found');
+    }
+    
     if (webinar.hasNotEnoughSeats()) {
       throw new WebinarNotEnoughSeatsException();
     }
@@ -47,17 +55,21 @@ export class BookSeat implements Executable<Request, Response> {
 
     await this.participationRepository.save(participation);
 
-    const organizer = await this.userRepository.findById(webinar.props.organizerId);
+    const organizer = await this.userRepository.findById(
+      webinar.props.organizerId,
+    );
 
-    if (organizer instanceof User) {
-      const email: Email = {
-        to: organizer.props.email,
-        subject: 'New participant',
-        body: `A new participant has booked a seat for your webinar ${webinar.props.title}.`,
-      };
-
-      await this.mailer.send(email);
+    if(!organizer) {
+      throw new Error('Organizer not found');
     }
+
+    const email: Email = {
+      to: organizer.props.email,
+      subject: 'New participant',
+      body: `A new participant has booked a seat for your webinar ${webinar.props.title}.`,
+    };
+
+    await this.mailer.send(email);
 
     return;
   }

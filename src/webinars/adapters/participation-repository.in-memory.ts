@@ -8,7 +8,7 @@ export class InMemoryParticipationRepository implements IParticipationRepository
   constructor(public database: Participation[] = []) {}
 
   async findByWebinarId(webinarId: string): Promise<Participation[]> {
-    this.database.filter((participation) => participation.props.webinarId === webinarId);
+    return this.database.filter((participation) => participation.props.webinarId === webinarId);
   }
 
   async save(participation: Participation): Promise<void> {
