@@ -1,5 +1,5 @@
 import { User } from 'src/users/entities/user.entity';
 
 export interface IUserRepository {
-  findById(id: string): Promise<User | null>;
+  findById(id: string): Promise<User | undefined>;
 }
